@@ -26,16 +26,16 @@
 ## Демонстрация работы
 
 ### 1. Оценка выбросов CO2 на основе городского трафика
-<!-- ПОДСКАЗКА: Загрузи скриншот с дорогой и машинами в репозиторий и замени ссылку ниже на свою -->
-<img src="https://via.placeholder.com/800x400.png?text=Traffic+and+CO2+Analysis" alt="Traffic Camera Analysis">
+
+<img width="513" height="412" alt="image" src="https://github.com/user-attachments/assets/b733d617-e787-4158-bd6d-d398d9a0146a" />
 
 ### 2. Спутниковая карта загрязнений NO2 (Sentinel-5P)
-<!-- ПОДСКАЗКА: Загрузи скриншот со спутниковой картой в репозиторий и замени ссылку ниже -->
-<img src="https://via.placeholder.com/800x400.png?text=Sentinel-5P+Satellite+Map" alt="Satellite Scan">
+
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/97adf7ab-d24d-4b87-9291-ff61234248dd" />
 
 ### 3. Метрики обучения кастомной модели на дым/выбросы
-<!-- ПОДСКАЗКА: Загрузи скриншот с графиками обучения в репозиторий и замени ссылку ниже -->
-<img src="https://via.placeholder.com/results.png?text=YOLO+Training+Metrics" alt="Training Metrics">
+
+<img width="2400" height="1200" alt="results" src="https://github.com/user-attachments/assets/1888b19c-21ed-4dfa-953b-a5c75a3a9585" />
 
 ---
 
