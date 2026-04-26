@@ -27,7 +27,7 @@
 
 ---
 
-## 📸 Демонстрация работы
+## Демонстрация работы
 
 ### 1. Оценка выбросов CO₂ на основе городского трафика
 
@@ -43,7 +43,7 @@
 
 ---
 
-## 📁 Структура проекта
+## Структура проекта
 
 ```
 EcoEYE/
@@ -125,7 +125,7 @@ go build -o streamer
 
 ---
 
-## 💻 Использование
+## Использование
 
 ### Запуск на Windows (всё в одном)
 ```bash
@@ -160,7 +160,7 @@ pollution_map = get_no2_data(latitude=55.75, longitude=37.62, date="2026-04-26")
 
 ---
 
-## 📊 API и интеграции
+## API и интеграции
 
 ### Telegram бот команды
 - `/start` — Начало работы
@@ -177,7 +177,7 @@ POST /api/alert         # Создать оповещение
 
 ---
 
-## 🧠 Модели и обучение
+## Модели и обучение
 
 ### YOLOv8 для трафика
 - **Модель**: YOLOv8 Large
@@ -197,7 +197,7 @@ python train_custom_model.py --epochs 100 --dataset ./data/smoke_dataset
 
 ---
 
-## 🔧 Архитектура
+## Архитектура
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -222,7 +222,7 @@ python train_custom_model.py --epochs 100 --dataset ./data/smoke_dataset
 
 ---
 
-## 📈 Производительность
+## Производительность
 
 | Метрика | Значение |
 |---------|----------|
@@ -249,15 +249,9 @@ python train_custom_model.py --epochs 100 --dataset ./data/smoke_dataset
 
 ---
 
-## 📝 Лицензия
+## Лицензия
 
 Проект распространяется под лицензией **MIT**. Подробнее см. в файле [LICENSE](LICENSE).
-
----
-
-## 👨‍💻 Автор
-
-- **Georgi Jotov** — [GitHub](https://github.com/gjotov)
 
 ---
 
@@ -270,11 +264,10 @@ python train_custom_model.py --epochs 100 --dataset ./data/smoke_dataset
 
 ---
 
-## 📞 Контакты и поддержка
+## Контакты и поддержка
 
 - **Issues**: [GitHub Issues](https://github.com/gjotov/EcoEYE/issues)
 - **Обсуждения**: [GitHub Discussions](https://github.com/gjotov/EcoEYE/discussions)
-- **Email**: contact@example.com
 
 ---
 
