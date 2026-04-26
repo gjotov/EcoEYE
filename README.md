@@ -35,7 +35,7 @@
 
 ### 3. Метрики обучения кастомной модели на дым/выбросы
 <!-- ПОДСКАЗКА: Загрузи скриншот с графиками обучения в репозиторий и замени ссылку ниже -->
-<img src="https://via.placeholder.com/800x400.png?text=YOLO+Training+Metrics" alt="Training Metrics">
+<img src="https://via.placeholder.com/results.png?text=YOLO+Training+Metrics" alt="Training Metrics">
 
 ---
 
