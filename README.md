@@ -232,26 +232,6 @@ python train_custom_model.py --epochs 100 --dataset ./data/smoke_dataset
 | GPU Memory | ~4 GB |
 | Время генерации отчёта | ~5 сек |
 
----
-
-## 🤝 Вклад
-
-Приветствуются pull requests! Для больших изменений сначала откройте issue для обсуждения.
-
-```bash
-# Процесс вклада
-1. Fork репозитория
-2. Создайте ветку (git checkout -b feature/AmazingFeature)
-3. Commit изменения (git commit -m 'Add AmazingFeature')
-4. Push в ветку (git push origin feature/AmazingFeature)
-5. Откройте Pull Request
-```
-
----
-
-## Лицензия
-
-Проект распространяется под лицензией **MIT**. Подробнее см. в файле [LICENSE](LICENSE).
 
 ---
 
@@ -277,8 +257,6 @@ python train_custom_model.py --epochs 100 --dataset ./data/smoke_dataset
 - [ ] Веб-интерфейс на React/Vue
 - [ ] Интеграция с системами ПДД для анализа загруженности дорог
 - [ ] Machine Learning для предсказания пиков загрязнения
-- [ ] Мобильное приложение
-- [ ] Поддержка нескольких городов
 
 ---
 
