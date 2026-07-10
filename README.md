@@ -1,10 +1,9 @@
-# 🌍 EcoEYE: AI Environmental Monitoring System
+# EcoEYE: AI Environmental Monitoring System
 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)
 ![YOLOv8](https://img.shields.io/badge/YOLOv8-FF1493?style=for-the-badge&logo=ultralytics&logoColor=white)
 ![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 **EcoEYE** — это интеллектуальная система экологического мониторинга города, созданная на базе компьютерного зрения, анализа спутниковых данных и машинного обучения. Система автоматически отслеживает уровни загрязнения, анализирует транспортный поток и предупреждает о промышленных выбросах через Telegram.
 
