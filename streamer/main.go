@@ -1,66 +1,80 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
-	"net/http"
-	"sync"
 	"time"
 
+	"github.com/go-zeromq/zmq4"
 	"gocv.io/x/gocv"
 )
 
 type CameraStream struct {
-	ID        string
-	URL       string
-	LastFrame gocv.Mat
-	Mutex     sync.RWMutex
-	Active    bool
+	ID  string
+	URL string
 }
 
-// ВСЕ 9 КАМЕР
+type FrameData struct {
+	CamID string
+	Bytes []byte
+}
+
 var cams = map[string]*CameraStream{
-	// --- ЛЕНИНА ---
-	"Lenina_36662": {URL: "https://flussonic2.powernet.com.ru:444/user36662/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
-	"Lenina_72349": {URL: "https://flussonic2.powernet.com.ru:444/user72349/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
-	"Lenina_82418": {URL: "https://flussonic2.powernet.com.ru:444/user82418/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
-
-	// --- МИРА ---
-	"Mira_93635": {URL: "https://flussonic2.powernet.com.ru:444/user93635/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
-	"Mira_96368": {URL: "https://flussonic2.powernet.com.ru:444/user96368/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
-	"Mira_70484": {URL: "https://flussonic2.powernet.com.ru:444/user70484/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
-
-	// --- АЛЕКСАНДРОВА ---
+	"Lenina_36662":        {URL: "https://flussonic2.powernet.com.ru:444/user36662/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
+	"Lenina_72349":        {URL: "https://flussonic2.powernet.com.ru:444/user72349/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
+	"Lenina_82418":        {URL: "https://flussonic2.powernet.com.ru:444/user82418/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
+	"Mira_93635":          {URL: "https://flussonic2.powernet.com.ru:444/user93635/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
+	"Mira_96368":          {URL: "https://flussonic2.powernet.com.ru:444/user96368/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
+	"Mira_70484":          {URL: "https://flussonic2.powernet.com.ru:444/user70484/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
 	"Aleksandrova_12216":  {URL: "https://flussonic2.powernet.com.ru:444/user12216/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
 	"Aleksandrova_105259": {URL: "https://flussonic2.powernet.com.ru:444/user105259/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
 	"Aleksandrova_12070":  {URL: "https://flussonic2.powernet.com.ru:444/user12070/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel"},
 }
 
 func main() {
+	frameChan := make(chan FrameData, 100)
+
+	// Start video capture loops
 	for id, cam := range cams {
 		cam.ID = id
-		cam.LastFrame = gocv.NewMat()
-		cam.Active = false
-		go captureLoop(cam)
+		go captureLoop(cam, frameChan)
 	}
 
-	http.HandleFunc("/frame", handleFrame)
-	fmt.Println("🚀 Go Streamer: Загружено 9 камер. Порт :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	// Initialize Pure-Go ZMQ Publisher
+	publisher := zmq4.NewPub(context.Background())
+	defer publisher.Close()
+
+	err := publisher.Listen("tcp://127.0.0.1:5555")
+	if err != nil {
+		log.Fatalf("ZMQ server start error: %v", err)
+	}
+	fmt.Println("🚀 Go Streamer (PURE GO): Broadcasting 9 cameras on ZMQ tcp://127.0.0.1:5555")
+
+	for frame := range frameChan {
+		msg := zmq4.NewMsgFrom(
+			[]byte(frame.CamID),
+			frame.Bytes,
+		)
+
+		err := publisher.Send(msg)
+		if err != nil {
+			log.Printf("[-] Error sending packet to ZMQ: %v", err)
+		}
+	}
 }
 
-func captureLoop(cam *CameraStream) {
+func captureLoop(cam *CameraStream, frameChan chan<- FrameData) {
 	for {
 		cap, err := gocv.OpenVideoCaptureWithAPI(cam.URL, gocv.VideoCaptureFFmpeg)
 		if err != nil {
-			fmt.Printf("[-] %s: Ретрай 5с...\n", cam.ID)
+			fmt.Printf("[-] %s: Connection error, retrying in 5s...\n", cam.ID)
 			time.Sleep(5 * time.Second)
 			continue
 		}
 
 		img := gocv.NewMat()
-		cam.Active = true
-		fmt.Printf("[+] %s: ONLINE\n", cam.ID)
+		fmt.Printf("[+] %s: CONNECTED\n", cam.ID)
 
 		for {
 			if ok := cap.Read(&img); !ok {
@@ -70,35 +84,24 @@ func captureLoop(cam *CameraStream) {
 				continue
 			}
 
-			cam.Mutex.Lock()
-			img.CopyTo(&cam.LastFrame)
-			cam.Mutex.Unlock()
-			time.Sleep(20 * time.Millisecond) // 50 FPS лимит, чтобы не грузить проц зря
+			// Encode frame as JPEG (75% quality)
+			buf, err := gocv.IMEncodeWithParams(gocv.JPEGFileExt, img, []int{gocv.IMWriteJpegQuality, 75})
+			if err != nil {
+				continue
+			}
+
+			frameChan <- FrameData{
+				CamID: cam.ID,
+				Bytes: buf.GetBytes(),
+			}
+			buf.Close()
+
+			// Limit to 10 FPS
+			time.Sleep(100 * time.Millisecond)
 		}
-		cam.Active = false
 		cap.Close()
 		img.Close()
+		fmt.Printf("[-] %s: Connection lost, reconnecting in 2s...\n", cam.ID)
 		time.Sleep(2 * time.Second)
 	}
-}
-
-func handleFrame(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
-	cam, ok := cams[id]
-	if !ok {
-		http.Error(w, "ID not found", 404)
-		return
-	}
-
-	cam.Mutex.RLock()
-	defer cam.Mutex.RUnlock()
-
-	if !cam.Active || cam.LastFrame.Empty() {
-		http.Error(w, "Wait...", 503)
-		return
-	}
-
-	buf, _ := gocv.IMEncode(".jpg", cam.LastFrame)
-	w.Header().Set("Content-Type", "image/jpeg")
-	w.Write(buf.GetBytes())
 }

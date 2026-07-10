@@ -1,3 +1,36 @@
+from modules import db
+
+def get_historical_comparison(camera_id, current_cars):
+    try:
+        conn = db.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT AVG(cars_count) as avg_cars FROM traffic_stats 
+            WHERE camera_id = ? AND timestamp >= datetime('now', '-2 hours')
+        ''', (camera_id,))
+        
+        row = cursor.fetchone()
+        conn.close()
+        
+        if row and row['avg_cars'] is not None:
+            avg_cars = row['avg_cars']
+            if avg_cars == 0: 
+                return ""
+            
+            # Считаем разницу в процентах
+            diff_percent = int(((current_cars - avg_cars) / avg_cars) * 100)
+            
+            if diff_percent > 15:
+                return f" (📈 на {diff_percent}% выше нормы)"
+            elif diff_percent < -15:
+                return f" (📉 на {abs(diff_percent)}% ниже нормы)"
+                
+    except Exception as e:
+        print(f"[Reporter Stats Error] {e}")
+        
+    return " (в пределах нормы)"
+
 def get_health_advice(toxic_idx):
     if toxic_idx < 1000:
         return "✅ <b>Зеленая зона.</b> Воздух в норме. Можно проветривать и гулять."
@@ -19,13 +52,17 @@ def format_traffic_report(cam_name, cars, heavy, toxic_idx, co2, weather_text):
         status = "🔴 ТРАНСПОРТНЫЙ КОЛЛАПС"
         level = "CRITICAL"
 
+    comparison = get_historical_comparison(cam_name, cars)
     advice = get_health_advice(toxic_idx)
+
+    display_name = cam_name.replace("_", " ")
 
     return (
         f"{status}\n"
         f"➖➖➖➖➖➖➖➖\n"
-        f"📍 <b>{cam_name}</b>\n"
-        f"🚙 Легковых: <b>{cars}</b> | 🚛 Грузовых: <b>{heavy}</b>\n"
+        f"📍 <b>{display_name.upper()}</b>\n"
+        f"🚙 Легковых: <b>{cars}</b>{comparison}\n"
+        f"🚛 Грузовых: <b>{heavy}</b>\n"
         f"☁️ Выброс CO2: <b>~{co2:.2f} кг</b> (за 10 мин)\n"
         f"🌡 Индекс токсичности: {toxic_idx}\n"
         f"➖➖➖➖➖➖➖➖\n"

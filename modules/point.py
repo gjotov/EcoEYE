@@ -1,9 +1,7 @@
 import cv2
 import numpy as np
 
-# Ссылка на камеру с "грузовиком-ларьком"
 STREAM_URL = "http://localhost:8080/frame?id=Aleksandrova_12070" 
-# (Или прямая ссылка, если Go не запущен)
 
 points = []
 
@@ -16,14 +14,12 @@ def click_event(event, x, y, flags, params):
             cv2.line(img, tuple(points[-2]), tuple(points[-1]), (0, 255, 0), 2)
         cv2.imshow('Setup ROI', img)
 
-# Для теста качаем картинку через urllib (так как это http поток от Go)
 import urllib.request
 try:
     resp = urllib.request.urlopen(STREAM_URL)
     arr = np.asarray(bytearray(resp.read()), dtype=np.uint8)
     img = cv2.imdecode(arr, -1)
 except:
-    # Если Go не работает, пробуем VideoCapture напрямую
     cap = cv2.VideoCapture("https://flussonic2.powernet.com.ru:444/user36662/tracks-v1/mono.m3u8?token=dont-panic-and-carry-a-towel")
     ret, img = cap.read()
     cap.release()

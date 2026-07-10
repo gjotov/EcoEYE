@@ -1,8 +1,8 @@
-TOKEN = "8261630396:AAFAUYMvWvywKTrcRIebMD6ND5xIMxv9618"
-CHANNEL_ID = "@eco4vlz"
-GEE_PROJECT = "ecolog-482416"
+TOKEN = "token"
+CHANNEL_ID = "@id"
+GEE_PROJECT = "id"
 
-CAR_MODEL_PATH = "yolov8l.pt"
+CAR_MODEL_PATH = "models/yolov8l.pt"
 
 CITY_CAMS = {
     
